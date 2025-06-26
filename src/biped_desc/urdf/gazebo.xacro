@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- <gazebo reference="caster_wheel_link"> -->
+  <!--   <mu1 value="0.1" /> -->
+  <!--   <mu2 value="0.1" /> -->
+  <!-- </gazebo> -->
+
+  <!-- <gazebo> -->
+  <!--   <plugin -->
+  <!--     filename="gz-sim-joint-state-publisher-system" -->
+  <!--     name="gz::sim::systems::JointStatePublisher"> -->
+  <!--   </plugin> -->
+  <!-- </gazebo> -->
+
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+      <parameters>$(find your_package)/config/controllers.yaml</parameters>
+      <!-- add the yaml file  -->
+    </plugin>
+  </gazebo>
+
+</robot>

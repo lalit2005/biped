@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<robot name="robo" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find biped_desc)/urdf/base.xacro" />
+  <!-- <xacro:include filename="$(find biped_desc)/urdf/gazebo.xacro" /> -->
+  <!-- <xacro:include filename="$(find biped_desc)/urdf/ros2_control.xacro" /> -->
+
+  <!-- variables -->
+  <!-- the bot walks in the y direction -->
+
+  <xacro:property name="femur_height" value="0.2" />
+  <xacro:property name="femur_length" value="0.1" />
+  <xacro:property name="femur_width" value="0.06" />
+
+  <xacro:property name="leg_height" value="0.2" />
+  <xacro:property name="leg_length" value="0.1" />
+  <xacro:property name="leg_width" value="0.06" />
+
+  <xacro:property name="base_height" value="0.2" /> <!-- z axis, blue color -->
+  <xacro:property name="base_length" value="0.35" /> <!-- x axis, red color -->
+  <xacro:property name="base_width" value="0.2" /> <!-- y axis, green color -->
+
+  <xacro:property name="feet_height" value="0.04" />
+  <xacro:property name="feet_length" value="0.15" />
+  <xacro:property name="feet_width" value="0.15" />
+
+  <!-- macros -->
+
+  <xacro:macro name="femur_link" params="prefix">
+    <link name="${prefix}_femur_link">
+      <visual>
+        <geometry>
+          <box size="${femur_length} ${femur_width} ${femur_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-femur_height / 2.0}" rpy="0 0 0" />
+        <material name="lightgray" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${femur_length} ${femur_width} ${femur_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-femur_height / 2.0}" rpy="0 0 0" />
+      </collision>
+      <xacro:box_inertia m="0.500" x="${femur_length}" y="${femur_width}" z="${femur_height}" o_xyz="0 0 ${-femur_height / 2.0}" o_rpy="0 0 0" />
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="leg_link" params="prefix">
+    <link name="${prefix}_leg_link">
+      <visual>
+        <geometry>
+          <box size="${leg_length} ${leg_width} ${leg_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-leg_height / 2.0}" rpy="0 0 0" />
+        <material name="gray" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${leg_length} ${leg_width} ${leg_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-leg_height / 2.0}" rpy="0 0 0" />
+      </collision>
+      <xacro:box_inertia m="0.500" x="${leg_length}" y="${leg_width}" z="${leg_height}" o_xyz="0 0 ${-leg_height / 2.0}" o_rpy="0 0 0" />
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="feet_link" params="prefix">
+    <link name="${prefix}_feet_link">
+      <visual>
+        <geometry>
+          <box size="${feet_length} ${feet_width} ${feet_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-feet_height / 2.0}" rpy="0 0 0" />
+        <material name="gray" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${feet_length} ${feet_width} ${feet_height}" />
+        </geometry>
+        <origin xyz="0 0 ${-feet_height / 2.0}" rpy="0 0 0" />
+      </collision>
+      <xacro:box_inertia m="0.200" x="${feet_length}" y="${feet_width}" z="${feet_height}" o_xyz="0 0 ${-feet_height / 2.0}" o_rpy="0 0 0" />
+    </link>
+  </xacro:macro>
+
+  <!-- parts -->
+
+  <link name="base_footprint" />
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${femur_height + leg_height + feet_height}" rpy="0 0 0" />
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height} "/>
+      </geometry>
+      <origin xyz="0 0 ${base_height / 2.0}" rpy="0 0 0" />
+      <material name="gray" />
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height} "/>
+      </geometry>
+      <origin xyz="0 0 ${base_height / 2.0}" rpy="0 0 0" />
+    </collision>
+    <xacro:box_inertia m="0.850" x="${base_length}" y="${base_height}" z="${base_width}" o_xyz="0 0 ${base_height / 2.0}" o_rpy="0 0 0" />
+  </link>
+
+  <!-- left femur and leg -->
+
+  <xacro:femur_link prefix="left"/>
+
+  <joint name="base_left_femur_joint" type="revolute">
+    <parent link="base_link" />
+    <child link="left_femur_link" />
+    <origin xyz="${base_length / 2.75} 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0" />
+    <limit lower="-${pi / 4.0}" upper="${pi / 4.0}" effort="100" velocity="100" />
+  </joint>
+
+  <xacro:leg_link prefix="left"/>
+
+  <joint name="left_leg_femur_joint" type="revolute">
+    <parent link="left_femur_link" />
+    <child link="left_leg_link" />
+    <origin xyz="0 0 ${-leg_height}" rpy="0 0 0"/>
+    <axis xyz="1 0 0" />
+    <limit lower="-${pi / 4.0}" upper="${pi / 4.0}" effort="100" velocity="100" />
+  </joint>
+
+  <!-- right femur and leg -->
+
+  <xacro:femur_link prefix="right"/>
+
+  <joint name="base_right_femur_joint" type="revolute">
+    <parent link="base_link" />
+    <child link="right_femur_link" />
+    <origin xyz="${-base_length / 2.75} 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0" />
+    <limit lower="-${pi / 4.0}" upper="${pi / 4.0}" effort="100" velocity="100" />
+  </joint>
+
+  <xacro:leg_link prefix="right"/>
+
+  <joint name="right_leg_femur_joint" type="revolute">
+    <parent link="right_femur_link" />
+    <child link="right_leg_link" />
+    <origin xyz="0 0 ${-leg_height}" rpy="0 0 0"/>
+    <axis xyz="1 0 0" />
+    <limit lower="-${pi / 4.0}" upper="${pi / 4.0}" effort="100" velocity="100" />
+  </joint>
+
+  <!-- feet -->
+
+  <xacro:feet_link prefix="left" />
+
+  <joint name="left_feet_femur_joint" type="fixed">
+    <parent link="left_leg_link" />
+    <child link="left_feet_link" />
+    <origin xyz="0 0 ${-leg_height}" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:feet_link prefix="right" />
+
+  <joint name="right_feet_femur_joint" type="fixed">
+    <parent link="right_leg_link" />
+    <child link="right_feet_link" />
+    <origin xyz="0 0 ${-leg_height}" rpy="0 0 0"/>
+  </joint>
+
+</robot>

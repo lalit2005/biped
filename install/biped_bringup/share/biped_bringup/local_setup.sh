@@ -1,0 +1,1 @@
+/home/lalit/Documents/dev/scratchpad/ros-playground/biped/build/biped_bringup/ament_cmake_environment_hooks/local_setup.sh
